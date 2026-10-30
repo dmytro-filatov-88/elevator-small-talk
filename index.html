@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>Elevator Small Talk Simulator 🛗😬 | 99 Floors of Pure Corporate Agony</title>
+  <meta name="description" content="Trapped in a 99-floor elevator ride with an awkward coworker and procedural bossa nova muzak. Manage eye contact, answer horrifying small talk, and survive the ascent without dying of cringe.">
+
+  <!-- Custom Inline SVG Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231a1b26'/%3E%3Crect x='10' y='8' width='44' height='48' rx='4' fill='%23333846' stroke='%23fbbf24' stroke-width='2'/%3E%3Crect x='16' y='12' width='32' height='10' rx='2' fill='%230b0e14'/%3E%3Ctext x='20' y='20' fill='%23ef4444' font-family='monospace' font-size='8' font-weight='bold'%3E▲ 99%3C/text%3E%3Ccircle cx='26' cy='34' r='7' fill='%23fcd34d'/%3E%3Ccircle cx='24' cy='33' r='1.5' fill='%23111'/%3E%3Ccircle cx='28' cy='33' r='1.5' fill='%23111'/%3E%3Cpath d='M23 38 Q26 36 29 38' stroke='%23111' stroke-width='1' fill='none'/%3E%3Ccircle cx='38' cy='34' r='7' fill='%23fed7aa'/%3E%3Ccircle cx='36' cy='33' r='1.5' fill='%23111'/%3E%3Ccircle cx='40' cy='33' r='1.5' fill='%23111'/%3E%3Cpath d='M35 38 Q38 40 41 38' stroke='%23111' stroke-width='1' fill='none'/%3E%3Cpath d='M32 24 L32 54' stroke='%234b5563' stroke-width='1.5' stroke-dasharray='2,2'/%3E%3C/svg%3E">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- High Tension Vignette Overlay (Glows red as cringe rises) -->
+  <div id="tension-vignette" class="tension-vignette" aria-hidden="true"></div>
+
+  <!-- Main Elevator Environment -->
+  <div class="elevator-viewport">
+
+    <!-- TOP CONTROL HUD -->
+    <header class="elevator-hud">
+      <div class="hud-box floor-box" title="Current Floor">
+        <span class="hud-label">FLOOR</span>
+        <div class="led-display">
+          <span class="led-arrow">▲</span>
+          <span id="floor-number" class="led-digits">01</span>
+          <span class="led-max">/ 99</span>
+        </div>
+      </div>
+
+      <div class="hud-box awkward-box" title="Awkwardness Level. If it hits 100%, the elevator halts in shame!">
+        <div class="meter-header">
+          <span class="hud-label">AWKWARDNESS METER</span>
+          <span id="awkward-percent" class="meter-value">12%</span>
+        </div>
+        <div class="meter-bar-track">
+          <div id="awkward-bar" class="meter-bar-fill" style="width: 12%;"></div>
+        </div>
+        <div class="meter-status" id="meter-status">Tolerable Silence</div>
+      </div>
+
+      <div class="hud-controls">
+        <button id="btn-speed" class="hud-btn" title="Toggle Express Elevator Speed (S / X)">
+          <span class="btn-icon">⚡</span>
+          <span id="speed-label" class="btn-text">1x SPEED</span>
+        </button>
+        <button id="btn-sound" class="hud-btn" title="Toggle Bossa Nova Muzak & Audio (M)">
+          <span id="sound-icon" class="btn-icon">🔊</span>
+          <span id="sound-label" class="btn-text">MUZAK ON</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ELEVATOR CABIN INTERIOR -->
+    <main class="elevator-cabin" id="cabin">
+      <!-- Metallic Reflection Lines & Ceiling Lights -->
+      <div class="cabin-ceiling">
+        <div class="light-fixture fixture-left"></div>
+        <div class="light-fixture fixture-center"></div>
+        <div class="light-fixture fixture-right"></div>
+      </div>
+
+      <!-- Elevator Back Wall Panels -->
+      <div class="wall-mirrors">
+        <div class="mirror-panel"></div>
+        <div class="mirror-panel center-seam"></div>
+        <div class="mirror-panel"></div>
+      </div>
+
+      <!-- Wall Items -->
+      <div class="wall-decor">
+        <!-- Inspection Certificate Frame (Clickable Easter Egg) -->
+        <div id="permit-frame" class="permit-frame" tabindex="0" role="button" aria-label="Inspect Elevator Certificate" title="Click to inspect elevator permit">
+          <div class="permit-glass">
+            <div class="permit-seal">★</div>
+            <div class="permit-text">
+              <span class="permit-title">CERTIFICATE</span>
+              <span class="permit-sub">MAX: 8 HUMANS</span>
+              <span class="permit-date">EXPIRED 2017</span>
+            </div>
+          </div>
+          <span class="click-hint">Inspect [3]</span>
+        </div>
+
+        <!-- Corporate Motivational Poster -->
+        <div class="corporate-poster" id="corporate-poster" title="Corporate Synergy">
+          <div class="poster-icon">📈</div>
+          <div class="poster-slogan">"SYNERGY IS MANDATORY"</div>
+        </div>
+
+        <!-- Brass Elevator Control Panel -->
+        <div class="elevator-panel" id="elevator-panel">
+          <div class="panel-header">OTIS-9000</div>
+          <div class="button-grid">
+            <button class="panel-btn" data-floor="99" title="Executive Floor 99">99</button>
+            <button class="panel-btn" data-floor="77">77</button>
+            <button class="panel-btn" data-floor="42" title="The Answer?">42</button>
+            <button class="panel-btn" data-floor="13" title="Unlucky Floor">13</button>
+            <button class="panel-btn active-floor" id="panel-btn-curr" data-floor="1">01</button>
+            <button class="panel-btn btn-close-door" id="btn-close-door" title="Hammer this button to feel in control!">▶||◀</button>
+          </div>
+          <button class="panel-emergency-btn" id="btn-emergency-bell" title="Emergency Help Intercom">
+            🔔 ALARM
+          </button>
+        </div>
+      </div>
+
+      <!-- THE NPC: GARY FROM COMPLIANCE -->
+      <div class="npc-container" id="npc-container">
+        <!-- Speech Bubble for NPC -->
+        <div id="npc-bubble" class="npc-speech-bubble hidden">
+          <div id="npc-text" class="bubble-content">Crazy weather we're having, huh?</div>
+          <div class="bubble-arrow"></div>
+        </div>
+
+        <!-- NPC Character Illustration (Dynamic Vector) -->
+        <div class="npc-character" id="npc-body">
+          <!-- Floating Sweat Drops when awkward -->
+          <div id="sweat-container" class="sweat-container"></div>
+
+          <!-- Head & Facial Features -->
+          <div class="npc-head-wrap" id="npc-head">
+            <div class="npc-hair"></div>
+            <div class="npc-head">
+              <!-- Eyebrows -->
+              <div class="npc-eyebrows">
+                <div class="eyebrow eyebrow-left" id="eyebrow-left"></div>
+                <div class="eyebrow eyebrow-right" id="eyebrow-right"></div>
+              </div>
+              <!-- Procedural Darting Eyes -->
+              <div class="npc-eyes">
+                <div class="eye eye-left" id="npc-eye-l">
+                  <div class="pupil" id="npc-pupil-l"></div>
+                </div>
+                <div class="eye eye-right" id="npc-eye-r">
+                  <div class="pupil" id="npc-pupil-r"></div>
+                </div>
+              </div>
+              <!-- Nose -->
+              <div class="npc-nose"></div>
+              <!-- Mouth (changes expressions) -->
+              <div class="npc-mouth neutral" id="npc-mouth"></div>
+              <!-- Red Nervous Blush (fades in with cringe) -->
+              <div class="npc-blush" id="npc-blush"></div>
+            </div>
+          </div>
+
+          <!-- Neck & Corporate Lanyard -->
+          <div class="npc-neck">
+            <div class="lanyard">
+              <div class="lanyard-strap"></div>
+              <div class="lanyard-badge" id="npc-badge" title="Gary - Senior Vice Associate of Synergistic Compliance">
+                <span class="badge-photo">👤</span>
+                <span class="badge-name">GARY</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Torso & Business Attire -->
+          <div class="npc-torso">
+            <div class="shirt-collar"></div>
+            <div class="tie"></div>
+            <!-- Holding Lukewarm Coffee Cup (Clickable Easter Egg) -->
+            <div class="npc-arm-left" id="coffee-arm" title="Click Gary's coffee to make him take an awkward sip!">
+              <div class="coffee-cup" id="coffee-cup">
+                <div class="cup-lid"></div>
+                <div class="cup-body">
+                  <span class="cup-logo">☕</span>
+                  <span class="cup-text">JAVA</span>
+                </div>
+                <div class="cup-steam" id="cup-steam">~</div>
+              </div>
+            </div>
+            <div class="npc-arm-right"></div>
+          </div>
+
+          <!-- Legs & Shoes -->
+          <div class="npc-legs">
+            <div class="leg leg-left"></div>
+            <div class="leg leg-right"></div>
+          </div>
+        </div>
+
+        <!-- Gary's Status Caption -->
+        <div class="npc-caption" id="npc-caption">
+          Gary (Senior Compliance Associate)
+        </div>
+      </div>
+
+      <!-- PLAYER'S POV SHOES (Look Target #2) -->
+      <div id="player-shoes-view" class="player-shoes-view hidden">
+        <div class="shoes-container">
+          <div class="shoe shoe-left">
+            <div class="shoe-lace"></div>
+            <div class="shoe-scuff"></div>
+          </div>
+          <div class="shoe shoe-right">
+            <div class="shoe-lace"></div>
+            <div class="shoe-tag">🏷️ "Why did I wear these?"</div>
+          </div>
+        </div>
+        <div class="shoes-inner-dialogue" id="shoes-thought">
+          "If I inspect my scuffed loafers with surgical precision, Gary won't talk to me."
+        </div>
+      </div>
+
+      <!-- PLAYER'S SMARTPHONE (Look Target #4) -->
+      <div id="player-phone-view" class="player-phone-view hidden">
+        <div class="phone-chassis">
+          <div class="phone-speaker"></div>
+          <div class="phone-screen">
+            <div class="phone-status-bar">
+              <span>9:41 AM</span>
+              <span class="text-danger">📶 Searching... 🔋 1%</span>
+            </div>
+            <div class="phone-content" id="phone-content">
+              <div class="fake-notification">
+                <div class="notif-title">Slack Notification</div>
+                <div class="notif-body">Gary from Compliance is currently in the elevator with you.</div>
+              </div>
+              <div class="fake-feed">
+                <div class="feed-post">
+                  <strong>@CorporateMemes</strong>
+                  <p>Elevator rides over 20 seconds qualify as psychological warfare.</p>
+                </div>
+                <div class="feed-spinner">🌀 Refreshing empty feed...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ELEVATOR CABIN FLOOR -->
+      <div class="cabin-floor">
+        <div class="floor-carpet"></div>
+        <div class="door-threshold">
+          <div class="threshold-groove"></div>
+          <div class="threshold-groove"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- SMALL TALK DIALOGUE MODAL / CONVERSATION CARD -->
+    <section id="dialogue-card" class="dialogue-card hidden" aria-live="polite">
+      <div class="dialogue-header">
+        <span class="dialogue-speaker">💬 GARY ASKS:</span>
+        <div class="timer-wrap" title="Time left to answer before agonizing silence!">
+          <div id="dialogue-timer-bar" class="dialogue-timer-fill"></div>
+        </div>
+      </div>
+      <p id="dialogue-prompt" class="dialogue-question">
+        "Working hard, or hardly working? Haha..."
+      </p>
+      <div class="dialogue-options" id="dialogue-options">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- GAZE & ACTION CONTROLS (BOTTOM BAR) -->
+    <footer class="elevator-footer">
+      <div class="gaze-selector-label">WHERE ARE YOU LOOKING?</div>
+      <div class="gaze-buttons" role="radiogroup" aria-label="Gaze Direction">
+        <button class="gaze-btn active" data-gaze="floor" id="gaze-floor" title="Look up at Floor Counter [1]">
+          <span class="gaze-icon">🔢</span>
+          <span class="gaze-name">Floor LED</span>
+          <span class="gaze-key">[1]</span>
+        </button>
+        <button class="gaze-btn" data-gaze="shoes" id="gaze-shoes" title="Stare down at your shoes [2]">
+          <span class="gaze-icon">👞</span>
+          <span class="gaze-name">Your Shoes</span>
+          <span class="gaze-key">[2]</span>
+        </button>
+        <button class="gaze-btn" data-gaze="permit" id="gaze-permit" title="Squint at expired permit [3]">
+          <span class="gaze-icon">📄</span>
+          <span class="gaze-name">Permit</span>
+          <span class="gaze-key">[3]</span>
+        </button>
+        <button class="gaze-btn" data-gaze="phone" id="gaze-phone" title="Pretend to check 1% battery phone [4]">
+          <span class="gaze-icon">📱</span>
+          <span class="gaze-name">Fake Phone</span>
+          <span class="gaze-key">[4]</span>
+        </button>
+        <button class="gaze-btn gaze-danger" data-gaze="npc" id="gaze-npc" title="Make direct unblinking eye contact [5]">
+          <span class="gaze-icon">👁️</span>
+          <span class="gaze-name">Eye Contact!</span>
+          <span class="gaze-key">[5]</span>
+        </button>
+      </div>
+
+      <!-- TACTICAL DEFENSE ACTIONS -->
+      <div class="action-buttons">
+        <button id="btn-nod" class="action-btn" title="Polite micro-nod to de-escalate tension (Spacebar)">
+          <span class="act-icon">🙇‍♂️</span>
+          <span class="act-label">Polite Micro-Nod</span>
+          <span class="act-key">[Space]</span>
+        </button>
+        <button id="btn-throat" class="action-btn" title="Clear throat loudly to break tension (Key C)">
+          <span class="act-icon">🗣️</span>
+          <span class="act-label" id="throat-label">"Ahem" (Throat)</span>
+          <span class="act-key">[C]</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- EASTER EGG MODAL: INSPECTION CERTIFICATE -->
+  <div id="permit-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-permit-title">
+    <div class="modal-window permit-modal-window">
+      <button class="modal-close" id="btn-close-permit" aria-label="Close modal">✕</button>
+      <div class="framed-permit">
+        <h2 id="modal-permit-title">MUNICIPAL ELEVATOR SAFETY CERTIFICATE</h2>
+        <div class="permit-stamp">VOID / CONDEMNED</div>
+        <div class="permit-details">
+          <p><strong>Device ID:</strong> Vertigo Express 9000-XL</p>
+          <p><strong>Max Capacity:</strong> 8 humans OR 1 very stressed golden retriever</p>
+          <p><strong>Cable Integrity:</strong> <em>"Looks fine from distance"</em> — Inspector Higgins</p>
+          <p><strong>Last Overhauled:</strong> October 2017</p>
+          <p><strong>Emergency Brakes:</strong> Made of reinforced recycled hope</p>
+          <p><strong>Soundtrack:</strong> 100% Unregulated Bossa Nova (Non-stop)</p>
+        </div>
+        <p class="permit-footnote">Notice: Looking at other passengers for more than 4 consecutive seconds constitutes an actionable OSHA violation.</p>
+        <button class="action-btn modal-btn" id="btn-permit-dismiss">Back to Elevator</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EASTER EGG MODAL: INTERCOM CALL -->
+  <div id="intercom-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-window intercom-modal-window">
+      <button class="modal-close" id="btn-close-intercom" aria-label="Close modal">✕</button>
+      <div class="intercom-ui">
+        <div class="intercom-speaker">
+          <div class="speaker-grill"></div>
+          <div class="speaker-light red-blink"></div>
+        </div>
+        <h3>ELEVATOR EMERGENCY HOTLINE</h3>
+        <p id="intercom-transcript" class="intercom-transcript">
+          "Thank you for calling Otis Emergency Assistance. All our technicians are currently trapped in other elevators. Your estimated hold time is 48 business hours. Please enjoy this complimentary synthesizer bossa nova."
+        </p>
+        <div class="intercom-actions">
+          <button class="action-btn" id="btn-hangup">Hang Up Intercom</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME OVER OVERLAY (DEATH BY CRINGE) -->
+  <div id="game-over-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-window game-over-window">
+      <div class="game-over-icon">💀😬</div>
+      <h2 class="game-over-title">CRITICAL CRINGE OVERLOAD!</h2>
+      <p class="game-over-subtitle">
+        The Awkwardness Meter hit 100%. The tension shattered the elevator cables!
+      </p>
+      
+      <div class="stats-summary" id="game-over-stats">
+        <div class="stat-row">
+          <span class="stat-name">Floors Survived:</span>
+          <span class="stat-val" id="stat-floors">42 / 99</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-name">Suffocating Silence:</span>
+          <span class="stat-val" id="stat-time">38s</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-name">Fatal Gaze Choice:</span>
+          <span class="stat-val" id="stat-fatal-gaze">Unblinking Eye Contact</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-name">Gary's Final Thought:</span>
+          <span class="stat-val font-italic" id="stat-gary-thought">"I should have taken the stairs."</span>
+        </div>
+      </div>
+
+      <button id="btn-retry" class="action-btn retry-btn">
+        🛗 Take Next Elevator
+      </button>
+    </div>
+  </div>
+
+  <!-- VICTORY OVERLAY (SURVIVED TO FLOOR 99) -->
+  <div id="victory-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-window victory-window">
+      <div class="victory-icon">🎉🏢✨</div>
+      <h2 class="victory-title">PENTHOUSE FREEDOM!</h2>
+      <p class="victory-subtitle">
+        DING! The doors slide open at Floor 99. Gary sprints out sobbing with relief. You survived the ascent without dying of cringe!
+      </p>
+
+      <div class="stats-summary" id="victory-stats">
+        <div class="stat-row">
+          <span class="stat-name">Floors Conquered:</span>
+          <span class="stat-val text-gold">99 / 99</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-name">Peak Awkwardness:</span>
+          <span class="stat-val" id="stat-peak-cringe">68%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-name">Small Talk Dodged:</span>
+          <span class="stat-val" id="stat-topics">8 awkward topics</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-name">Award Earned:</span>
+          <span class="stat-val text-gold">🏆 Master of Polite Avoidance</span>
+        </div>
+      </div>
+
+      <button id="btn-replay" class="action-btn retry-btn">
+        🛗 Ride Again from Lobby
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Game Script -->
+  <script src="app.js"></script>
+
+<script>window.__BORED_AI_SLUG__="elevator-small-talk";</script>
+<script src="report-widget.js"></script>
+</body>
+</html>
